@@ -65,7 +65,40 @@ each folder in "VF_Main_16kHz" has a unique speakerID and contains two subfolder
 This is all we have as our raw data. Now we will deform these `.wav` files into data format that Kaldi can read in.
 
 ### Data preparation
+Let's start with formatting data. We will randomly split wave files into test and train dataset. Create a directory data and,then two subdirectories train and test in it.
 
+Now, for each dataset (train, test), we need to generate these files representing our raw data - the audio and the transcripts.
+
+* `text`
+    * Essentially, transcripts.
+    * An utterance per line, `<utt_id> <transcript>` 
+        * e.g. `0_0_1_1_1_1_0_0 NO NO YES YES YES YES NO NO`
+    * We will use filenames without extensions as utt_ids for now.
+    * Although recordings are in Hebrew, we will use English words, YES and NO, to avoid complicating the problem.
+* `wav.scp`
+    * Indexing files to unique ids. 
+    * `<file_id> <wave filename with path OR command to get wave file>`
+        * e.g. `0_1_0_0_1_0_1_1 waves_yesno/0_1_0_0_1_0_1_1.wav`
+    * Again, we can use file names as file_ids.
+* `utt2spk`
+    * For each utterance, mark which speaker spoke it.
+    * `<utt_id> <speaker_id>`
+        * e.g. `0_0_1_0_1_0_1_1 global`
+    * Since we have only one speaker in this example, let's use "global" as speaker_id
+* `spk2utt`
+    * Simply inverse indexed `utt2spk` (`<speaker_id> <all_hier_utterences>`)
+    * Can use a Kaldi utility to generate
+    * `utils/utt2spk_to_spk2utt.pl data/train_yesno/utt2spk > data/train_yesno/spk2utt`
+* (optional) `segments`: *not used for this data.*
+    * Contains utterance segmentation/alignment information for each recording. 
+    * Only required when a file contains multiple utterances, which is not this case.
+* (optional) `reco2file_and_channel`: *not used for this data. *
+    * Only required when audios were recorded in dual channels for conversational setup.
+* (optional) `spk2gender`: not used for this data. 
+    * Map from speakers to their gender information. 
+    * Used in vocal tract length normalization. 
+our task is to generate this file. you can use
+I encourage
 
  
 
