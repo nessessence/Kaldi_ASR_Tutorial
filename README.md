@@ -58,32 +58,33 @@ there are two options to download VoxForge dataset
 
 VoxForge dataset has 95628 `.wav` files, sampled at 16 kHz by 1235 identified speakers and 2164 anonymous speakers(for this tutorial, speech recognition task is speaker independent which doesn't care about the speakers)
 
-each folder in "VF_Main_16kHz" has a unique speakerID and contains two subfolders
+each directory in "VF_Main_16kHz" has a unique speakerID and contains two directories
   - wav : contains `.wav` files
   - etc : contains the information files of each `.wav` file.(In this tutorial, we'll focus on `prompts-original` file which contains the string of the name of `.wav` file and its transcription for each line)
 
 This is all we have as our raw data. Now we will deform these `.wav` files into data format that Kaldi can read in.
 
 ### Data preparation
-Let's start with formatting data. We will randomly split wave files into test and train dataset. Create a directory data and,then two subdirectories train and test in it.
+Let's start with formatting data. We will randomly split wave files into test and train dataset(set the ratio as you want). Create a directory data and,then two subdirectories train and test in it.
 
 Now, for each dataset (train, test), we need to generate these files representing our raw data - the audio and the transcripts.
 
 * `text`
     * Essentially, transcripts.
     * An utterance per line, `<utt_id> <transcript>` 
-        * e.g. `0_0_1_1_1_1_0_0 NO NO YES YES YES YES NO NO`
+        * e.g. `Aaron-20080318-kdl_b0019 HIS SLIM HANDS GRIPPED THE EDGES OF THE TABLE `
     * We will use filenames without extensions as utt_ids for now.
     * Although recordings are in Hebrew, we will use English words, YES and NO, to avoid complicating the problem.
 * `wav.scp`
     * Indexing files to unique ids. 
     * `<file_id> <wave filename with path OR command to get wave file>`
-        * e.g. `0_1_0_0_1_0_1_1 waves_yesno/0_1_0_0_1_0_1_1.wav`
+        * e.g. `Aaron-20080318-kdl_b0019 /mnt/data/VF_Main_16kHz/Aaron-20080318-kdl/wav/b0019.wav
+`
     * Again, we can use file names as file_ids.
 * `utt2spk`
     * For each utterance, mark which speaker spoke it.
     * `<utt_id> <speaker_id>`
-        * e.g. `0_0_1_0_1_0_1_1 global`
+        * e.g. `Aaron-20080318-kdl_b0019 Aaron`
     * Since we have only one speaker in this example, let's use "global" as speaker_id
 * `spk2utt`
     * Simply inverse indexed `utt2spk` (`<speaker_id> <all_hier_utterences>`)
@@ -97,9 +98,30 @@ Now, for each dataset (train, test), we need to generate these files representin
 * (optional) `spk2gender`: not used for this data. 
     * Map from speakers to their gender information. 
     * Used in vocal tract length normalization. 
-our task is to generate this file. you can use
-I encourage
+    
+our task is to generate these files. although you can use this [preparation_data.ipynb](https://github.com/nessessence/Kaldi_VoxForge/blob/master/data_preparation.ipynb) python notebook which is very easy to use,   I encourage you to write your own script because it'll improve your understanding of Kaldi format.
+Kaldi has a scrip that clean up any possible errors in the data. Run
 
+```bash
+utils/fix_data_dir.sh data/train/
+utils/fix_data_dir.sh data/test/
+```
+
+
+If you're done with the code, your data directory should look like this, at this point. 
+```
+data
+├───train_yesno
+│   ├───text
+│   ├───utt2spk
+│   ├───spk2utt
+│   └───wav.scp
+└───test_yesno
+    ├───text
+    ├───utt2spk
+    ├───spk2utt
+    └───wav.scp
+```
  
 
 
