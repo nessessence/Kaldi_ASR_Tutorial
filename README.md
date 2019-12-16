@@ -89,7 +89,7 @@ Now, for each dataset (train, test), we need to generate these files representin
     * Since we have only one speaker in this example, let's use "global" as speaker_id
 * `spk2utt`
     * Simply inverse indexed `utt2spk` (`<speaker_id> <all_hier_utterences>`)
-* `full_vocab` : list of the vocabulary of in text of training data. *only for train directory
+* `full_vocab` : list of all the vocabulary in the text of training data. (this file will be used for making the dictionary)   
 * (optional) `segments`: *not used for this data.*
     * Contains utterance segmentation/alignment information for each recording. 
     * Only required when a file contains multiple utterances, which is not this case.
@@ -142,14 +142,24 @@ Next we will build dictionaries. Let's start with creating intermediate `dict` d
 ```bash
 vf# mkdir -p data/local/dict
 ```
-Your `dict` directory should contain these 5 files:
+Your `dict` directory should contain at least these 5 files:
 
 * `lexicon.txt`: list of word-phone pairs
-* `lexiconp.txt` : list of word-prob-phone pairs
-* `silence_phones.txt`: list of silent phones
-* `nonsilence_phones.txt`: list of non-silent phones
-* `optional_silence.txt`: list of optional silent phones (here, this looks the same as `silence_phones.txt`)
+* (optional)`lexiconp.txt` : list of word-prob-phone pairs
+* `silence_phones.txt`: list of silent phones 
+* `nonsilence_phones.txt`: list of non-silent phones (including various kinds of noise, laugh, cough, filled pauses etc)
+* `optional_silence.txt`: contains just a single phone (typically SIL)
   
+we can use `/utils/prepare_dict.sh` to generate all the files above excluding `lexiconp.txt`
+breif explaination for the command `/utils/prepare_dict.sh`: 
+1. download the general word-phone pairs open source dictionary ( In this code, use "cmudict" ).
+2. the pairs of the word which contained in both the general dictionary and `full_vocab` will be in `lexicon-iv.txt`.
+3.  the word which contained in the `full_vocab`, but not in the general dictionary will be in `vocab-oov.txt` (oov standfor "out-of-vocab").
+4. generates the pronunciations of those oov vocab using a pre-trained Sequitur G2P model in `conf/g2p_model` and store the pairs in `lexicon-oov.txt`.
+5. merege `lexicon-iv.txt` and `lexicon-oov.txt` and adding silent symbol (typically (<SIL>,SIL)) at the end to generate the `lexicon.txt`.
+6. generate the other files. 
+Note: all the files are in an alphabetical order. and you change the parameter `ss` at the top in ` /utils/prepare_dict.sh ` file to set the silent symbol as you want. (In this tutorial use "<SIL>" as the silient symbol )
+
 Let's look at each file format and example.
 
 lexicon.txt: ``` <word> <phone1> <phone2>  …. <phoneN> ```  in an alphabetical order of word.
@@ -162,27 +172,17 @@ ABANDONMENT	AH B AE N D AH N M AH N T
 ABLE	EY B AH L
 ABNORMAL	AE B N AO R M AH L
 ```
-in order to generate lexicon.txt file, you can use ``` /local/utils/prepare_dict.sh  ```
-which will create:
-
 Note: as you can see, lexicon.txt will contain repeated entries for the same word on separate lines, if we have multiple pronunciations for it. 
-
 
 `lexiconp.txt`: ``` <word> <pron-prob> <phone1> <phone2>  …. <phoneN> ```  #similar to lexicon.txt, just add the pronounciation-probability term.
 
-
-
-
-However, in real speech, there are not only human sounds that contributes to a linguistic expression, but also silence and noises. 
-Kaldi calls all those non-linguistic sounds "*silence*".
-For example, even in this small, controlled recordings, we have pauses between each word. 
-Thus we need an additional phone "SIL" representing silence. And it can be happening at end of of all words. Kaldi calls this kind of silence "*optional*".
-
+`silence_phones.txt`:
 ```bash
-echo "SIL" > data/local/dict/silence_phones.txt
-echo "SIL" > data/local/dict/optional_silence.txt
-mv data/local/dict/phones.txt data/local/dict/nonsilence_phones.txt
+vf# more silence_phones.txt
+SIL
 ```
+
+
 
 Now amend lexicon to include the silence as well.
 
@@ -190,7 +190,7 @@ Now amend lexicon to include the silence as well.
 cp data/local/dict/lexicon.txt data/local/dict/lexicon_words.txt
 echo "<SIL> SIL" >> data/local/dict/lexicon.txt 
 ```
-**Note** that "\<SIL\>" will also be used as our OOV token later.
+**Note** that "<SIL>" will also be used as our OOV token later.
 
 
 
