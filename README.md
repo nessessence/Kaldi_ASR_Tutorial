@@ -1,5 +1,5 @@
 # Kaldi: auto speech recognition tutorial 
-This repositoty is mainly modified from this [yesno_tutorial](https://github.com/ekapolc/ASR_classproject/tree/master/yesnotutorial). and all the references are addressed below the tutorial.
+This repository is mainly modified from this [yesno_tutorial](https://github.com/ekapolc/ASR_classproject/tree/master/yesnotutorial). and all the references are addressed below the tutorial.
 
 This tutorial will guide you through some basic functionalities and operations of [Kaldi](http://kaldi-asr.org/) ASR toolkit which can be applied in any general auto speech recognition tasks.
 In this tutorial, we will use [VoxForge](http://www.voxforge.org/home/downloads) dataset which is one of the most popular datasets for auto speech recognition.
@@ -117,7 +117,7 @@ data
 │   ├───utt2spk
 │   ├───spk2utt
 │   |───wav.scp
-|   └───full_vocab           //only for train directory
+|   └───full_vocab  *only for train directory
 └───test
     ├───text
     ├───utt2spk
@@ -157,7 +157,7 @@ brief explaination for the command `/utils/prepare_dict.sh`:
 3. the word which contained in the `full_vocab`(which we have been generated since data preparation), but not in the general dictionary will be in `vocab-oov.txt` (oov standfor "out-of-vocab").
 4. generates the pronounciations of those oov-vocab using a pre-trained Sequitur G2P model in `conf/g2p_model` and stores the pairs in `lexicon-oov.txt`.
 5. merge `lexicon-iv.txt` and `lexicon-oov.txt` then adding silence symbol (typically (<SIL>,SIL)) at the end to generate the `lexicon.txt`.
-6. generate the other files. 
+6. generates the other files. 
 Note: all the files are in an alphabetical order. and you change the parameter `ss` at the top in ` /utils/prepare_dict.sh ` file to set the silence symbol as you want. (In this tutorial use "<SIL>" as the silence symbol )
 
 Let's look at each file format and example.
