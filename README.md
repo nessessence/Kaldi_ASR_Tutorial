@@ -152,7 +152,7 @@ Your `dict` directory should contain at least these 5 files:
   
 we can use `/utils/prepare_dict.sh` to generate all the files above excluding `lexiconp.txt`
 breif explaination for the command `/utils/prepare_dict.sh`: 
-1. download the general word-phone pairs open source dictionary ( In this code, use "cmudict" ).
+1. download the general word-phone pairs open source dictionary ( this toturial uses "cmudict" ).
 2. the pairs of the word which contained in both the general dictionary and `full_vocab` will be in `lexicon-iv.txt`.
 3.  the word which contained in the `full_vocab`, but not in the general dictionary will be in `vocab-oov.txt` (oov standfor "out-of-vocab").
 4. generates the pronunciations of those oov vocab using a pre-trained Sequitur G2P model in `conf/g2p_model` and store the pairs in `lexicon-oov.txt`.
@@ -184,12 +184,6 @@ SIL
 
 
 
-Now amend lexicon to include the silence as well.
-
-```bash
-cp data/local/dict/lexicon.txt data/local/dict/lexicon_words.txt
-echo "<SIL> SIL" >> data/local/dict/lexicon.txt 
-```
 **Note** that "<SIL>" will also be used as our OOV token later.
 
 
@@ -206,15 +200,97 @@ We're using `--position-dependent-phones` flag to be false in our tiny, tiny toy
 * `<TEMP_DIR>`: Could be anywhere. I'll just put a new directory `tmp` inside `dict`.
 * `<OUTPUT_DIR>`: This output will be used in further training. Set it to `data/lang`.
 
+## Step 3 - Feature extraction and training
 
-### Defining sequence of the blocks: Language model
+This section will cover how to perform MFCC feature extraction and GMM modeling.
 
-We are given a sample uni-gram language model for the yesno data. 
-You'll find a `arpa` formatted language model inside `data/local` directory. 
-However, again, the language model also needs to be converted into a FST.
-For that, Kaldi also comes with a number of programs.
-In this example, we will use the script, `local/prepare_lm.sh`.
-It will generate properly formatted LM FST and put it in `data/lang_test_tg`.
+### Feature extraction
+
+Once we have all data ready, it's time to extract features for GMM training.
+
+First extract mel-frequency cepstral coefficients.
+
+```bash
+steps/make_mfcc.sh --nj <N> <INPUT_DIR> <LOG_DIR> <OUTPUT_DIR> 
+```
+
+* `--nj <N>` : number of processors, defaults to 4. Kaldi splits the processes by speaker information. Therefore, `nj` must be lesser than or equal to the number of speakers in `<INPUT_DIR>`. For this simple tutorial which has 1 speaker, `nj` must be 1.
+* `<INPUT_DIR>` : where we put our 'data' of training set
+* `<LOG_DIR>` : directory to dumb log files. Let's put output to `exp/make_mfcc/train_yesno`, following Kaldi recipes convention
+* `<OUTPUT_DIR>` : Directory to put the features. The convention uses `mfcc/train`
+
+Now normalize cepstral features using Cepstral Mean Normalization just like we did in our previous homework. This step also does an extra variance normalization. Thus, the process is called Cepstral Mean and Variance Normalization (CMVN).
+
+```bash
+steps/compute_cmvn_stats.sh <INPUT_DIR> <LOG_DIR> <OUTPUT_DIR>
+```
+`<INPUT_DIR>`, `<LOG_DIR>`, and `<OUTPUT_DIR>` are the same as above.
+
+The two scripts will create `wav.scp` and `cmvn.scp` which specifies where the computed MFCC and CMVN are. `wav.scp` and `cmvn.scp` are just text files with just `<utt_id> <path_to_data>` for each line. With this setup, by passing the `data/train` directory to a Kaldi script, you are passing various information, such as the transcription, the location of the wav file, or the MFCC features.
+
+**Note** that these shell scripts (`.sh`) are all pipelines through Kaldi binaries with trivial text processing on the fly. To see which commands were actually executed, see log files in `<LOG_DIR>`. Or even better, see inside the scripts. For details on specific Kaldi commands, refer to [the official documentation](http://kaldi-asr.org/doc/tools.html).
+
+### Monophone model training
+
+We will train a monophone model, since we assume that, in our toy language, phones are not context-dependent. 
+(which is, of course, an absurd assumption)
+
+```bash 
+steps/train_mono.sh --nj <N> --cmd <MAIN_CMD> --totgauss 400 <DATA_DIR> <LANG_DIR> <OUTPUT_DIR>
+```
+* `--cmd <MAIN_CMD>`: To use local machine resources, use `"utils/run.pl"` pipeline.
+* `--totgauss : limits the number of gaussian mixtures to 400
+* `--nj <N>`: Utterances from a speaker cannot be processed in parallel. Since we have only one, we must use 1 job only. 
+* `<DATA_DIR>`: Path to our training 'data'
+* `<LANG_DIR>`: Path to language definition (output of the `prepare_lang` script)
+* `<OUTPUT_DIR>`: like the previous, use `exp/mono`.
+
+When you run the command, you will notice it doing EM. Each iteration does an alignment stage and an update stage. 
+
+This will generate FST-based lattice for acoustic model. Kaldi provides a tool to see inside the model (which may not make any sense now).
+
+```bash
+/path/to/kaldi/src/fstbin/fstcopy 'ark:gunzip -c exp/mono/fsts.1.gz|' ark,t:- | head -n 20
+```
+This will print out first 20 lines of the lattice in human-readable(!!) format (Each column indicates: Q-from, Q-to, S-in, S-out, Cost)
+
+## Step 4 - Decoding and testing
+
+This section will cover decoding of the model we trained.
+
+### Graph decoding
+
+Now we're done with acoustic model training. 
+For decoding, we need a new input that goes over our lattices of AM & LM. 
+In step 1, we prepared separate testset in `data/test_yesno` for this purpose. 
+Now it's time to project it into the feature space as well.
+Use `steps/make_mfcc.sh` and `steps/compute_cmvn_stats.sh` .
+
+Then, we need to build a fully connected FST (HCLG) network. 
+
+```bash
+utils/mkgraph.sh --mono data/lang_test_tg exp/mono exp/mono/graph_tgpr
+```
+This will build a connected HCLG in `exp/mono/graph_tgpr` directory. 
+
+Finally, we need to find the best paths for utterances in the test set, using decode script. Look inside the decode script, figure out what to give as its parameter, and run it. Write the decoding results in `exp/mono/decode_test_yesno`.
+
+```bash 
+steps/decode.sh 
+```
+
+This will end up with `lat.N.gz` files in the output directory, where N goes from 1 up to the number of jobs you used (which must be 1 for this task). These files contain lattices from utterances that were processed by N’th thread of your decoding operation.
+
+
+### Looking at results
+
+If you look inside the decoding script, it ends with calling the scoring script (`local/score.sh`), which generates hypotheses and computes word error rate of the testset 
+See `exp/mono/decode_test_yesno/wer_X` files to look the WER's, and `exp/mono/decode_test_yesno/scoring/X.tra` files for transcripts. 
+`X` here indicates language model weight, *LMWT*, that scoring script used at each iteration to interpret the best paths for utterances in `lat.N.gz` files into word sequences. (Remember `N` is #thread during decoing operartion)
+You can deliberately specify the weight using `--min_lmwt` and `--max_lmwt` options when `score.sh` is called, if you want. 
+(See lecture slides on decoding to refresh what LMWT is, if you are not sure)
+
+Or if you are interested in getting word-level alignment information for each reocoding file, take a look at `steps/get_ctm.sh` script.
 
 
 ### references and useful resources
