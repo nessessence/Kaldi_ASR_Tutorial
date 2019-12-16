@@ -184,7 +184,7 @@ SIL
 ```
 `nonsilence_phones.txt`:
 ```bash
-head -10 data/local/dict/nonsilence_phones.txt
+vf# head -10 data/local/dict/nonsilence_phones.txt
 AA
 AE
 AH
@@ -198,7 +198,7 @@ DH
 ```
 `optional_silence.txt`:
 ```bash
-more data/local/dict/optional_silence.txt 
+vf# more data/local/dict/optional_silence.txt 
 SIL
 ```
 **Note** that `<SIL>` will also be used as our OOV token later.
@@ -231,7 +231,7 @@ Once we have all data ready, it's time to extract features for GMM training.
 First extract mel-frequency cepstral coefficients.
 
 ```bash
-steps/make_mfcc.sh --nj <N> <INPUT_DIR> <LOG_DIR> <OUTPUT_DIR> 
+vf# steps/make_mfcc.sh --nj <N> <INPUT_DIR> <LOG_DIR> <OUTPUT_DIR> 
 ```
 
 * `--nj <N>` : number of processors, defaults to 4. Kaldi splits the processes by speaker information. Therefore, `nj` must be lesser than or equal to the number of speakers in `<INPUT_DIR>`. For this simple tutorial which has 1 speaker, `nj` must be 1.
@@ -239,10 +239,17 @@ steps/make_mfcc.sh --nj <N> <INPUT_DIR> <LOG_DIR> <OUTPUT_DIR>
 * `<LOG_DIR>` : directory to dumb log files. Let's put output to `exp/make_mfcc/train_yesno`, following Kaldi recipes convention
 * `<OUTPUT_DIR>` : Directory to put the features. The convention uses `mfcc/train`
 
+```bash
+vf# ls mfcc/train
+raw_mfcc_train.1.ark  raw_mfcc_train.2.scp  raw_mfcc_train.4.ark
+raw_mfcc_train.1.scp  raw_mfcc_train.3.ark  raw_mfcc_train.4.scp
+raw_mfcc_train.2.ark  raw_mfcc_train.3.scp
+```
 Now normalize cepstral features using Cepstral Mean Normalization just like we did in our previous homework. This step also does an extra variance normalization. Thus, the process is called Cepstral Mean and Variance Normalization (CMVN).
 
+
 ```bash
-steps/compute_cmvn_stats.sh <INPUT_DIR> <LOG_DIR> <OUTPUT_DIR>
+vf# steps/compute_cmvn_stats.sh <INPUT_DIR> <LOG_DIR> <OUTPUT_DIR>
 ```
 `<INPUT_DIR>`, `<LOG_DIR>`, and `<OUTPUT_DIR>` are the same as above.
 
@@ -250,13 +257,11 @@ The two scripts will create `wav.scp` and `cmvn.scp` which specifies where the c
 
 **Note** that these shell scripts (`.sh`) are all pipelines through Kaldi binaries with trivial text processing on the fly. To see which commands were actually executed, see log files in `<LOG_DIR>`. Or even better, see inside the scripts. For details on specific Kaldi commands, refer to [the official documentation](http://kaldi-asr.org/doc/tools.html).
 
-### Model training
-
-We will train a monophone model, since we assume that, in our toy language, phones are not context-dependent. 
-(which is, of course, an absurd assumption)
-
+### Training Acoustic Models   
+In this step, we'll train acoustic model using Kaldi Utilities.
+you can follow this `  ` 
 ```bash 
-steps/train_mono.sh --nj <N> --cmd <MAIN_CMD> --totgauss 400 <DATA_DIR> <LANG_DIR> <OUTPUT_DIR>
+vf# steps/train_mono.sh --nj <N> --cmd <MAIN_CMD> --totgauss 400 <DATA_DIR> <LANG_DIR> <OUTPUT_DIR>
 ```
 * `--cmd <MAIN_CMD>`: To use local machine resources, use `"utils/run.pl"` pipeline.
 * `--totgauss : limits the number of gaussian mixtures to 400
@@ -315,5 +320,6 @@ Or if you are interested in getting word-level alignment information for each re
 
 ### references and useful resources
 [official Kaldi document](https://kaldi-asr.org/doc)
+https://github.com/keighrim/kaldi-yesno-tutorial/blob/master/README.md
 
 
