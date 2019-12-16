@@ -16,7 +16,7 @@ The Kaldi will run on POSIX systems, with these software/libraries pre-installed
 * [`git`](https://git-scm.com/)
 * (optional) [`sox`](http://sox.sourceforge.net/)
 
-Recommendation: For Windows users, although Kaldi is supported in Windows, I highly recommend you to install it in a container of the UNIX operating system such as  Linux.
+Recommendation: For Windows users, although Kaldi is supported in Windows, I highly recommend you to install Kaldi in a container of the UNIX operating system such as Linux.
 
 The entire compilation can take a couple of hours and up to 8 GB of storage depending on your system specification and configuration. Make sure you have enough resource before start compiling.
 
@@ -156,9 +156,9 @@ brief explaination for the command `/utils/prepare_dict.sh`:
 2. the pairs of the word which contained in both the general dictionary and `full_vocab` will be in `lexicon-iv.txt`.
 3. the word which contained in the `full_vocab`(which we have been generated since data preparation), but not in the general dictionary will be in `vocab-oov.txt` (oov standfor "out-of-vocab").
 4. generates the pronounciations of those oov-vocab using a pre-trained Sequitur G2P model in `conf/g2p_model` and stores the pairs in `lexicon-oov.txt`.
-5. merge `lexicon-iv.txt` and `lexicon-oov.txt` then adding silent symbol (typically (<SIL>,SIL)) at the end to generate the `lexicon.txt`.
+5. merge `lexicon-iv.txt` and `lexicon-oov.txt` then adding silence symbol (typically (<SIL>,SIL)) at the end to generate the `lexicon.txt`.
 6. generate the other files. 
-Note: all the files are in an alphabetical order. and you change the parameter `ss` at the top in ` /utils/prepare_dict.sh ` file to set the silent symbol as you want. (In this tutorial use "<SIL>" as the silient symbol )
+Note: all the files are in an alphabetical order. and you change the parameter `ss` at the top in ` /utils/prepare_dict.sh ` file to set the silence symbol as you want. (In this tutorial use "<SIL>" as the silence symbol )
 
 Let's look at each file format and example.
 
