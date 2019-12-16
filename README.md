@@ -259,7 +259,8 @@ The two scripts will create `wav.scp` and `cmvn.scp` which specifies where the c
 
 ### Training Acoustic Models   
 In this step, we'll train acoustic model using Kaldi Utilities.
-you can follow this `  ` 
+you can follow this `train.sh` 
+for example: monophone model training
 ```bash 
 vf# steps/train_mono.sh --nj <N> --cmd <MAIN_CMD> --totgauss 400 <DATA_DIR> <LANG_DIR> <OUTPUT_DIR>
 ```
@@ -271,13 +272,16 @@ vf# steps/train_mono.sh --nj <N> --cmd <MAIN_CMD> --totgauss 400 <DATA_DIR> <LAN
 * `<OUTPUT_DIR>`: like the previous, use `exp/mono`.
 
 When you run the command, you will notice it doing EM. Each iteration does an alignment stage and an update stage. 
-
 This will generate FST-based lattice for acoustic model. Kaldi provides a tool to see inside the model (which may not make any sense now).
 
 ```bash
 /path/to/kaldi/src/fstbin/fstcopy 'ark:gunzip -c exp/mono/fsts.1.gz|' ark,t:- | head -n 20
 ```
 This will print out first 20 lines of the lattice in human-readable(!!) format (Each column indicates: Q-from, Q-to, S-in, S-out, Cost)
+
+Note: the training in `train.sh` is important. for example, inorder to `train tri1`, you have to train monophone and then alignment first.
+you don't have to follow all the training sequence in `train.sh`. it depends on complexity of your data.
+eg. for yes-no dataset, maybe just a monophone training is enough.
 
 ## Step 4 - Decoding and testing
 
