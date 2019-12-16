@@ -1,7 +1,7 @@
-# Kaldi: auto speech recognition tutorial 
+# Kaldi: Auto Speech Recognition tutorial 
 This repository is mainly modified from this [yesno_tutorial](https://github.com/ekapolc/ASR_classproject/tree/master/yesnotutorial). and all the references are addressed below the tutorial.
 
-This tutorial will guide you through some basic functionalities and operations of [Kaldi](http://kaldi-asr.org/) ASR toolkit which can be applied in any general auto speech recognition tasks.
+This tutorial will guide you through some basic functionalities and operations of [Kaldi](http://kaldi-asr.org/) ASR toolkit which can be applied in any general speech recognition tasks.
 In this tutorial, we will use [VoxForge](http://www.voxforge.org/home/downloads) dataset which is one of the most popular datasets for auto speech recognition.
 
 ## Step 0 - Installing Kaldi  
