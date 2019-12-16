@@ -179,15 +179,29 @@ Note: as you can see, lexicon.txt will contain repeated entries for the same wor
 
 `silence_phones.txt`:
 ```bash
-vf# more silence_phones.txt
+vf# more data/local/dict/silence_phones.txt
 SIL
 ```
-
-
-
+`nonsilence_phones.txt`:
+```bash
+head -10 data/local/dict/nonsilence_phones.txt
+AA
+AE
+AH
+AO
+AW
+AY
+B
+CH
+D
+DH
+```
+`optional_silence.txt`:
+```bash
+more data/local/dict/optional_silence.txt 
+SIL
+```
 **Note** that `<SIL>` will also be used as our OOV token later.
-
-
 
 Finally, we need to convert our dictionaries into a data structure that Kaldi would accept - finite state transducer (FST). Among many scripts Kaldi provides, we will use `utils/prepare_lang.sh` to generate FST-ready data formats to represent our language definition.
 
@@ -200,6 +214,11 @@ We're using `--position-dependent-phones` flag to be false in our tiny, tiny toy
 * `<OOV>`: `"<SIL>"`
 * `<TEMP_DIR>`: Could be anywhere. I'll just put a new directory `tmp` inside `dict`.
 * `<OUTPUT_DIR>`: This output will be used in further training. Set it to `data/lang`.
+
+```bash
+vf# ls data/lang
+L.fst  L_disambig.fst  oov.int	oov.txt  phones  phones.txt  topo  words.txt
+```
 
 ## Step 3 - Feature extraction and training
 
@@ -231,7 +250,7 @@ The two scripts will create `wav.scp` and `cmvn.scp` which specifies where the c
 
 **Note** that these shell scripts (`.sh`) are all pipelines through Kaldi binaries with trivial text processing on the fly. To see which commands were actually executed, see log files in `<LOG_DIR>`. Or even better, see inside the scripts. For details on specific Kaldi commands, refer to [the official documentation](http://kaldi-asr.org/doc/tools.html).
 
-### Monophone model training
+### Model training
 
 We will train a monophone model, since we assume that, in our toy language, phones are not context-dependent. 
 (which is, of course, an absurd assumption)
