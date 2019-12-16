@@ -152,16 +152,16 @@ Your `dict` directory should contain at least these 5 files:
   
 we can use `/utils/prepare_dict.sh` to generate all the files above excluding `lexiconp.txt`
 brief explaination for the command `/utils/prepare_dict.sh`: 
-1. download the general word-phone pairs open source dictionary ( this tutorial uses "cmudict" ).
+1. downloads the general word-phone pairs open source dictionary ( this tutorial uses "cmudict" ).
 2. the pairs of the word which contained in both the general dictionary and `full_vocab` will be in `lexicon-iv.txt`.
-3. the word which contained in the `full_vocab`(which we have been generated since data preparation), but not in the general dictionary will be in `vocab-oov.txt` (oov standfor "out-of-vocab").
+3. the words which contained in the `full_vocab`(which we have been generated since data preparation), but not in the general dictionary will be contained in `vocab-oov.txt` (oov standfor "out-of-vocab").
 4. generates the pronounciations of those oov-vocab using a pre-trained Sequitur G2P model in `conf/g2p_model` and stores the pairs in `lexicon-oov.txt`.
-5. merge `lexicon-iv.txt` and `lexicon-oov.txt` then adding silence symbol (typically (<SIL>,SIL)) at the end to generate the `lexicon.txt`.
+5. merges `lexicon-iv.txt` and `lexicon-oov.txt` then adds the silence symbol (typically (<SIL>,SIL)) at the end to generate the `lexicon.txt`.
 6. generates the other files. 
 
 Note: all the files are in an alphabetical order. and you change the parameter `ss` at the top in ` /utils/prepare_dict.sh ` file to set the silence symbol as you want. (In this tutorial use `<SIL>` as the silence symbol )
 
-Let's look at each file format and example.
+Let's look at each file format and overview.
 
 lexicon.txt: ``` <word> <phone1> <phone2>  .....  <phoneN> ```  in an alphabetical order of word.
 
