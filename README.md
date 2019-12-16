@@ -158,11 +158,12 @@ brief explaination for the command `/utils/prepare_dict.sh`:
 4. generates the pronounciations of those oov-vocab using a pre-trained Sequitur G2P model in `conf/g2p_model` and stores the pairs in `lexicon-oov.txt`.
 5. merge `lexicon-iv.txt` and `lexicon-oov.txt` then adding silence symbol (typically (<SIL>,SIL)) at the end to generate the `lexicon.txt`.
 6. generates the other files. 
-Note: all the files are in an alphabetical order. and you change the parameter `ss` at the top in ` /utils/prepare_dict.sh ` file to set the silence symbol as you want. (In this tutorial use "<SIL>" as the silence symbol )
+
+Note: all the files are in an alphabetical order. and you change the parameter `ss` at the top in ` /utils/prepare_dict.sh ` file to set the silence symbol as you want. (In this tutorial use `<SIL>` as the silence symbol )
 
 Let's look at each file format and example.
 
-lexicon.txt: ``` <word> <phone1> <phone2>  …. <phoneN> ```  in an alphabetical order of word.
+lexicon.txt: ``` <word> <phone1> <phone2>  .....  <phoneN> ```  in an alphabetical order of word.
 
 ```bash
 vf# head -5 data/local/dict/lexicon.txt
@@ -184,7 +185,7 @@ SIL
 
 
 
-**Note** that "<SIL>" will also be used as our OOV token later.
+**Note** that `<SIL>` will also be used as our OOV token later.
 
 
 
