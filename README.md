@@ -206,7 +206,7 @@ SIL
 Finally, we need to convert our dictionaries into a data structure that Kaldi would accept - finite state transducer (FST). Among many scripts Kaldi provides, we will use `utils/prepare_lang.sh` to generate FST-ready data formats to represent our language definition.
 
 ```bash
-utils/prepare_lang.sh --position-dependent-phones false <RAW_DICT_PATH> <OOV> <TEMP_DIR> <OUTPUT_DIR>
+vf# utils/prepare_lang.sh --position-dependent-phones false <RAW_DICT_PATH> <OOV> <TEMP_DIR> <OUTPUT_DIR>
 ```
 We're using `--position-dependent-phones` flag to be false in our tiny, tiny toy language. There's not enough context, anyways. For required parameters we will use: 
 
@@ -298,14 +298,14 @@ Use `steps/make_mfcc.sh` and `steps/compute_cmvn_stats.sh` .
 Then, we need to build a fully connected FST (HCLG) network. 
 
 ```bash
-utils/mkgraph.sh --mono data/lang_test_tg exp/mono exp/mono/graph_tgpr
+vf# utils/mkgraph.sh --mono data/lang_test_tg exp/mono exp/mono/graph_tgpr
 ```
 This will build a connected HCLG in `exp/mono/graph_tgpr` directory. 
 
 Finally, we need to find the best paths for utterances in the test set, using decode script. Look inside the decode script, figure out what to give as its parameter, and run it. Write the decoding results in `exp/mono/decode_test_yesno`.
 
 ```bash 
-steps/decode.sh 
+vf# steps/decode.sh 
 ```
 
 This will end up with `lat.N.gz` files in the output directory, where N goes from 1 up to the number of jobs you used (which must be 1 for this task). These files contain lattices from utterances that were processed by N’th thread of your decoding operation.
