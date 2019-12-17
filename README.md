@@ -31,7 +31,7 @@ there are two options to download VoxForge dataset
 
 ### Data description
 
-VoxForge dataset has 95628 `.wav` files, sampled at 16 kHz by 1235 identified speakers and 2164 anonymous speakers(for this tutorial, speech recognition task is speaker independent which doesn't care about the speakers)
+VoxForge dataset has 95628 `.wav` files, sampled at 16 kHz by 1235 identified speakers.
 
 each directory in "VF_Main_16kHz" has a unique speakerID and contains two directories
   - wav : contains `.wav` files
@@ -125,6 +125,7 @@ Your `dict` directory should contain at least these 5 files:
 * `optional_silence.txt`: contains just a single phone (typically SIL)
   
 we can use `/utils/prepare_dict.sh` to generate all the files above excluding `lexiconp.txt`
+
 brief explaination for the command `/utils/prepare_dict.sh`: 
 1. downloads the general word-phone pairs open source dictionary ( this tutorial uses "cmudict" ).
 2. the pairs of the word which contained in both the general dictionary and `full_vocab` will be in `lexicon-iv.txt`.
@@ -253,8 +254,9 @@ This will generate FST-based lattice for acoustic model. Kaldi provides a tool t
 ```
 This will print out first 20 lines of the lattice in human-readable(!!) format (Each column indicates: Q-from, Q-to, S-in, S-out, Cost)
 
-Note: the training in `train.sh` is important. for example, inorder to `train tri1`, you have to train monophone and then alignment first.
-you don't have to follow all the training sequence in `train.sh`. it depends on complexity of your data.
+Note: the training sequence in `train.sh` is important. for example, in order to get `tri1`, you have to train monophone and then alignment first.
+
+you don't have to complete all sequence of training in `train.sh`. it depends on the complexity of your data.
 eg. for yes-no dataset, maybe just a monophone training is enough.
 
 ## Step 4 - Decoding and testing
