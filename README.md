@@ -1,5 +1,5 @@
 # Kaldi: Auto Speech Recognition tutorial 
-This repository is mainly modified from this [yesno_tutorial](https://github.com/ekapolc/ASR_classproject/tree/master/yesnotutorial). and all the references are addressed below the tutorial.
+This repository is mainly modified from this [yesno_tutorial](https://github.com/ekapolc/ASR_classproject/tree/master/yesnotutorial). the other references are addressed below the tutorial.
 
 This tutorial will guide you through some basic functionalities and operations of [Kaldi](http://kaldi-asr.org/) ASR toolkit which can be applied in any general speech recognition tasks.
 In this tutorial, we will use [VoxForge](http://www.voxforge.org/home/downloads) dataset which is one of the most popular datasets for auto speech recognition.
@@ -302,5 +302,8 @@ Or if you are interested in getting word-level alignment information for each re
 [official Kaldi document](https://kaldi-asr.org/doc)
 
 https://github.com/keighrim/kaldi-yesno-tutorial/blob/master/README.md
+
+the https://github.com/ozps
+
 
 
