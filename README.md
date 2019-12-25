@@ -303,7 +303,7 @@ Or if you are interested in getting word-level alignment information for each re
 
 https://github.com/keighrim/kaldi-yesno-tutorial/blob/master/README.md
 
-the https://github.com/ozps
+https://github.com/ozps
 
 
 
